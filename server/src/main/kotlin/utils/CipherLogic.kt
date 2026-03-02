@@ -33,4 +33,26 @@ class CipherLogic(val cipherConfiguration: CipherConfiguration) {
             throw DecryptionException("Error during decryption: ${e.message}")
         }
     }
+
+    fun encrypt(plainText: String): String {
+        try {
+            val cipher = Cipher.getInstance(TRANSFORMATION)
+            cipher.init(Cipher.ENCRYPT_MODE, getSecretKeySpec())
+
+            val encryptedBytes = cipher.doFinal(plainText.toByteArray(Charsets.UTF_8))
+
+            // Codifica l'array di byte crittografato in una stringa Base64
+            return Base64.getEncoder().encodeToString(encryptedBytes)
+
+        } catch (e: Exception) {
+            throw RuntimeException("Errore durante l'encryption di test: ${e.message}", e)
+        }
+    }
+
+    private fun getSecretKeySpec(): SecretKeySpec {
+        val keyBytes = cipherConfiguration.key.chunked(2)
+            .map { it.toInt(16).toByte() }
+            .toByteArray()
+        return SecretKeySpec(keyBytes, ALGORITHM)
+    }
 }

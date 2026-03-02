@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+
+<Configuration>
+	<Debug></Debug>
+
+	<Database>
+		<DBConnectionString></DBConnectionString>
+		<DBDriver></DBDriver>
+		<DBUser></DBUser>
+		<DBPassword></DBPassword>
+	</Database>
+
+	<Server>
+		<Host></Host>
+		<Port></Port>
+	</Server>
+
+	<Encryption>
+		<Key></Key>
+	</Encryption>
+</Configuration>

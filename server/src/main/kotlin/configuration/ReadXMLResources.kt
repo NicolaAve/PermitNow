@@ -14,6 +14,7 @@ object ReadXMLResources {
         }else{
             File(xmlPath)
         }
+
         val serializer = Persister()
         val configuration = serializer.read(PermitNowConfiguration::class.java, xmlFile)
 

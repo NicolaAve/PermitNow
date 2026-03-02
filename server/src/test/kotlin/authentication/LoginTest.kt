@@ -43,16 +43,13 @@ class LoginTest {
     @Test
     fun `Existing User Login Test`(){
         val userManager = UserManager(dbConnection)
-        val registerJson = LoginJson(
+        val loginJson = LoginJson(
             email = "test@gmail.com",
             password = "12345678",
         )
 
         try {
-            if(userManager.login(registerJson) == -1){
-                throw LoginException("User not found.")
-            }
-            Assertions.assertTrue(true)
+            userManager.login(loginJson)
         }catch (e: LoginException){
             Assertions.assertTrue(false)
         }
@@ -61,14 +58,14 @@ class LoginTest {
     @Test
     fun `Not Valid Login Test`(){
         val userManager = UserManager(dbConnection)
-        val registerJson = LoginJson(
+        val loginJson = LoginJson(
             email = "test@gmail.com",
             password = "1234567",
         )
 
         try {
-            if(userManager.login(registerJson) == -1){
-                throw LoginException("User not found.")
+            if(userManager.login(loginJson) == -1){
+                throw LoginException("Invalid login.")
             }
             Assertions.assertTrue(false)
         }catch (e: LoginException){
@@ -79,15 +76,13 @@ class LoginTest {
     @Test
     fun `Empty Login Test`(){
         val userManager = UserManager(dbConnection)
-        val registerJson = LoginJson(
+        val loginJson = LoginJson(
             email = "",
             password = "",
         )
 
         try {
-            if(userManager.login(registerJson) == -1){
-                throw LoginException("User not found.")
-            }
+            userManager.login(loginJson)
             Assertions.assertTrue(false)
         }catch (e: LoginException){
             Assertions.assertTrue(true)
@@ -95,17 +90,15 @@ class LoginTest {
     }
 
     @Test
-    fun `Singele Empty Login Test`(){
+    fun `Single Empty Login Test`(){
         val userManager = UserManager(dbConnection)
-        val registerJson = LoginJson(
+        val loginJson = LoginJson(
             email = "",
-            password = "",
+            password = "12345678",
         )
 
         try {
-            if(userManager.login(registerJson) == -1){
-                throw LoginException("User not found.")
-            }
+            userManager.login(loginJson)
             Assertions.assertTrue(false)
         }catch (e: LoginException){
             Assertions.assertTrue(true)
