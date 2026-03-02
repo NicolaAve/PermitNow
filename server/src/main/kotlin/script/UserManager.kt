@@ -16,6 +16,10 @@ import org.jetbrains.exposed.sql.selectAll
 
 class UserManager(val connection: Database) {
     fun register(registerJson: RegisterJson) {
+        if(registerJson.role != "user" && registerJson.role != "admin") throw RegistrationException("Role not valid.")
+        if(registerJson.name == "" || registerJson.surname == "" || registerJson.email == "" || registerJson.password == "") throw RegistrationException("Missing required fields.")
+        if(!registerJson.email.contains("@")) throw RegistrationException("Email not valid.")
+
         try{
             transaction(connection) {
                 UserTable.insert {
@@ -34,6 +38,9 @@ class UserManager(val connection: Database) {
 
     fun login(loginJson: LoginJson): Int {
         try{
+            if(loginJson.email == "" || loginJson.password == "") throw LoginException("Missing required fields.")
+            if(!loginJson.email.contains("@")) throw LoginException("Email not valid.")
+
             return transaction(connection){
                 val userExists = UserTable.selectAll().where {
                     (UserTable.email eq loginJson.email) and (UserTable.password eq loginJson.password)
