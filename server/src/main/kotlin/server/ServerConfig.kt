@@ -22,6 +22,8 @@ import script.UserManager
 import server.JSONModels.LoginJson
 import server.JSONModels.RegisterJson
 import script.CipherLogic
+import script.FishingLicencesManager
+import server.JSONModels.FishingLicenceJson
 import java.time.LocalDateTime
 
 
@@ -40,6 +42,7 @@ val connection = Database.connect(
 )
 
 val userManager = UserManager(connection)
+val fishingLicenceManager = FishingLicencesManager(connection)
 val cipherLogic = CipherLogic(permitNowConfiguration.cipherConfiguration!!)
 
 
@@ -111,6 +114,18 @@ fun Application.module() {
                 println("Error during login: ${e.stackTraceToString()}")
                 call.respond(-1)
             }
+        }
+
+        post("/licence/fish"){
+            val input = call.receive<FishingLicenceJson>()
+            try{
+                fishingLicenceManager.createNewLicenceRequest(input.licenceText, input.userId)
+                call.respondText("success")
+            }catch (e: Exception){
+                println("Error during licence creation: ${e.stackTraceToString()}")
+                call.respondText("failure")
+            }
+
         }
 
     }

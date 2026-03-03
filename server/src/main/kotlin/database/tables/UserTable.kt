@@ -9,4 +9,5 @@ object UserTable:  IntIdTable("Users")  {
     val email = varchar("email", 255)
     val verified = bool("verified")
     val role = varchar("role", 100)
+    val fiscalCode = varchar("fiscal_code", 16)
 }

@@ -14,4 +14,5 @@ class UserEntity(id: EntityID<Int>) : IntEntity(id) {
     var email by UserTable.email
     var verified by UserTable.verified
     var role by UserTable.role
+    var fiscalCode by UserTable.fiscalCode
 }
