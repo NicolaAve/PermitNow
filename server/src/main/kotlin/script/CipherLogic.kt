@@ -1,8 +1,7 @@
-package utils
+package script
 
 import configuration.CipherConfiguration
 import exceptions.DecryptionException
-import java.security.MessageDigest
 import java.util.Base64
 import javax.crypto.Cipher
 import javax.crypto.spec.SecretKeySpec

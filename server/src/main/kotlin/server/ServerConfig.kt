@@ -7,7 +7,6 @@ import exceptions.RegistrationException
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
-import io.ktor.server.application.port
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
@@ -22,7 +21,7 @@ import org.jetbrains.exposed.sql.Database
 import script.UserManager
 import server.JSONModels.LoginJson
 import server.JSONModels.RegisterJson
-import utils.CipherLogic
+import script.CipherLogic
 import java.time.LocalDateTime
 
 

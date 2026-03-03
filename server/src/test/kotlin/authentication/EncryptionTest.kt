@@ -4,7 +4,7 @@ import configuration.ReadXMLResources
 import exceptions.DecryptionException
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
-import utils.CipherLogic
+import script.CipherLogic
 
 
 class EncryptionTest {
