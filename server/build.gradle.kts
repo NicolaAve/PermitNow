@@ -68,6 +68,9 @@ dependencies {
     // XML
     implementation("org.simpleframework:simple-xml:2.7.1")
 
+    //Google AI Vision
+    implementation("com.google.cloud:google-cloud-vision:3.84.0")
+
 
 
     testImplementation(kotlin("test"))

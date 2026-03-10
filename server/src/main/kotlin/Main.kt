@@ -1,4 +1,6 @@
 import configuration.ReadXMLResources
+import org.jetbrains.exposed.sql.Database
+import script.GoogleVision
 import server.ServerConfig
 import utils.TypesOfRun
 
@@ -19,8 +21,12 @@ internal object Main{
             TypesOfRun.TEST -> {
 
                 val configuration = ReadXMLResources.getConfiguration()
-                println(configuration.debug)
-                println(configuration.database?.dbUser)
+                val connection = Database.connect(
+                    configuration.database!!.dbConnectionString,
+                    configuration.database!!.dbDriver,
+                    configuration.database!!.dbUser,
+                    configuration.database!!.dbPassword
+                )
             }
         }
     }
