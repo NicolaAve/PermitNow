@@ -1,1 +1,28 @@
+# credenziali e sicurezza
 server/src/main/kotlin/utils/Variables.kt
+*.env
+.env
+
+#cache e build del server
+server/.gradle/
+server/build/
+server/out/
+*.jar
+
+#impostazioni IDE
+.idea/
+.vscode/
+*.code-workspace
+
+#per mc e windows
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+# Windows
+Thumbs.db
+ehthumbs.db
+$RECYCLE.BIN/
+
+#altre robe ( web e app) sono state inserite automaticaamente nei gitignore delle specifiche cartelle
