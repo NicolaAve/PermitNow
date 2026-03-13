@@ -59,4 +59,28 @@ class UserManager(val connection: Database) {
             throw LoginException("Error during Login: ${e.message}")
         }
     }
+
+    fun adminLogin(loginJson: LoginJson): Int{
+        try{
+            if(loginJson.email == "" || loginJson.password == "") throw LoginException("Missing required fields.")
+            if(!loginJson.email.contains("@")) throw LoginException("Email not valid.")
+
+            return transaction(connection){
+                val userExists = UserTable.selectAll().where {
+                    (UserTable.email eq loginJson.email) and (UserTable.password eq loginJson.password) and (UserTable.role eq "admin")
+                }.count() > 0
+
+                if (userExists) {
+                    UserTable.selectAll().where{
+                        (UserTable.email eq loginJson.email) and (UserTable.password eq loginJson.password)
+                    }.firstOrNull()!![UserTable.id].toString().toInt()
+                }else{
+                    -1
+                }
+            }
+
+        }catch (e: Exception){
+            throw LoginException("Error during Login: ${e.message}")
+        }
+    }
 }

@@ -4,6 +4,8 @@ import configuration.ReadXMLResources
 import exceptions.DecryptionException
 import exceptions.LoginException
 import exceptions.RegistrationException
+import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpMethod
 import io.ktor.http.content.PartData
 import io.ktor.http.content.forEachPart
 import io.ktor.http.content.streamProvider
@@ -13,6 +15,7 @@ import io.ktor.server.application.install
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.server.plugins.cors.routing.CORS
 import io.ktor.server.request.receive
 import io.ktor.server.request.receiveMultipart
 import io.ktor.server.response.respond
@@ -59,6 +62,22 @@ fun Application.module() {
             allowTrailingComma = true
         })
     }
+    install(CORS) {
+        allowMethod(HttpMethod.Options)
+        allowMethod(HttpMethod.Get)
+        allowMethod(HttpMethod.Post)
+        allowMethod(HttpMethod.Put)
+        allowMethod(HttpMethod.Delete)
+        allowMethod(HttpMethod.Patch)
+
+        allowHeader(HttpHeaders.ContentType)
+        allowHeader(HttpHeaders.Authorization)
+        allowHeader(HttpHeaders.AccessControlAllowOrigin)
+
+        anyHost() // da togliere in produzione
+    }
+
+
 
 
     routing {
@@ -69,14 +88,14 @@ fun Application.module() {
         post("/register"){
             val input = call.receive<RegisterJson>()
             try {
-                val decryptedJson = RegisterJson(
-                    name = cipherLogic.decrypt(input.name),
-                    surname = cipherLogic.decrypt(input.surname),
-                    email = cipherLogic.decrypt(input.email),
-                    password = cipherLogic.decrypt(input.password),
-                    role = cipherLogic.decrypt(input.role)
-                )
-                userManager.register(decryptedJson)
+//                val decryptedJson = RegisterJson(
+//                    name = cipherLogic.decrypt(input.name),
+//                    surname = cipherLogic.decrypt(input.surname),
+//                    email = cipherLogic.decrypt(input.email),
+//                    password = cipherLogic.decrypt(input.password),
+//                    role = cipherLogic.decrypt(input.role)
+//                )
+                userManager.register(input)
                 call.respondText("success")
             }catch (e: RegistrationException){
                 println(e.message)
@@ -94,18 +113,49 @@ fun Application.module() {
             val input = call.receive<LoginJson>()
             var userId: Int
             try{
-                val decryptedJson = LoginJson(
-                    email = cipherLogic.decrypt(input.email),
-                    password = cipherLogic.decrypt(input.password)
-                )
+//                val decryptedJson = LoginJson(
+//                    email = cipherLogic.decrypt(input.email),
+//                    password = cipherLogic.decrypt(input.password)
+//                )
 
-                userId = userManager.login(decryptedJson)
+                userId = userManager.login(input)
 
                 if(userId != -1){
-                    println("Login success, user ${decryptedJson.email} found")
+                    println("Login success, user ${input.email} found")
                     call.respond(userId)
                 }else{
-                    println("Login failed, user ${decryptedJson.email} not found")
+                    println("Login failed, user ${input.email} not found")
+                    call.respond(-1)
+                }
+
+            }catch (e: DecryptionException){
+                println(e.message)
+                call.respond(-1)
+            }catch (e: LoginException){
+                println(e.message)
+                call.respond(-1)
+            }catch (e: Exception){
+                println("Error during login: ${e.stackTraceToString()}")
+                call.respond(-1)
+            }
+        }
+
+        post("/login/admin"){
+            val input = call.receive<LoginJson>()
+            var userId: Int
+            try{
+//                val decryptedJson = LoginJson(
+//                    email = cipherLogic.decrypt(input.email),
+//                    password = cipherLogic.decrypt(input.password)
+//                )
+
+                userId = userManager.adminLogin(input)
+
+                if(userId != -1){
+                    println("Login success, user ${input.email} found")
+                    call.respond(userId)
+                }else{
+                    println("Login failed, user ${input.email} not found")
                     call.respond(-1)
                 }
 
@@ -177,7 +227,7 @@ object ServerConfig {
         embeddedServer(
             Netty,
             port = serverConfiguration!!.port.toInt(),
-            host = "0.0.0.0",
+            host = "127.0.0.1",
             module = Application::module
         ).start(wait = true)
     }
