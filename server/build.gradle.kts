@@ -91,7 +91,7 @@ tasks {
         archiveBaseName.set("shadow")
         mergeServiceFiles()
         manifest {
-            attributes(mapOf("Main-Class" to "org.example.Main"))
+            attributes(mapOf("Main-Class" to "Main"))
         }
     }
 }

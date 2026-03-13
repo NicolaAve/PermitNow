@@ -13,6 +13,7 @@ import server.JSONModels.RegisterJson
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.selectAll
+import server.JSONModels.UserJson
 
 class UserManager(val connection: Database) {
     fun register(registerJson: RegisterJson) {
@@ -79,6 +80,29 @@ class UserManager(val connection: Database) {
                 }
             }
 
+        }catch (e: Exception){
+            throw LoginException("Error during Login: ${e.message}")
+        }
+    }
+
+
+    fun getUserInfo(userId: Int): UserJson{
+        try{
+            return transaction(connection) {
+                UserTable.selectAll().where{
+                    UserTable.id eq userId
+                }.map {
+                    UserJson(
+                        name = it[UserTable.name],
+                        surname = it[UserTable.surname],
+                        password = it[UserTable.password],
+                        email = it[UserTable.email],
+                        role = it[UserTable.role],
+                        verified = it[UserTable.verified],
+                        fiscalCode = it[UserTable.fiscalCode]
+                    )
+                }.first()
+            }
         }catch (e: Exception){
             throw LoginException("Error during Login: ${e.message}")
         }

@@ -4,11 +4,12 @@ import database.tables.FishingLicencesTable
 import database.tables.UserTable
 import exceptions.FishingLicenceException
 import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.SortOrder
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.transactions.transaction
-import utils.models.Licence
 import utils.models.User
 import org.jetbrains.exposed.sql.selectAll
+import server.JSONModels.LicenceJson
 import java.util.UUID
 
 class FishingLicencesManager(val connection: Database) {
@@ -20,7 +21,6 @@ class FishingLicencesManager(val connection: Database) {
                 FishingLicencesTable.insert {
                     it[FishingLicencesTable.licenceNumber] = licence.licenceNumber
                     it[FishingLicencesTable.releasedBy] = licence.releasedBy
-                    it[FishingLicencesTable.typeOfPermit] = licence.typeOfPermit
                     it[FishingLicencesTable.userId] = userId
                     it[FishingLicencesTable.status] = "pending"
                     it[FishingLicencesTable.qr_code_token] = generateQRCodeToken()
@@ -38,7 +38,7 @@ class FishingLicencesManager(val connection: Database) {
          return UUID.randomUUID().toString()
     }
 
-    fun getLicenceFromText(retrievedText: String, userId: Int): Licence{
+    fun getLicenceFromText(retrievedText: String, userId: Int): LicenceJson{
 
         val tmpMap = mutableMapOf<String, String>()
 
@@ -84,10 +84,9 @@ class FishingLicencesManager(val connection: Database) {
 
         try {
             if(isValid(user, tmpMap)){
-                return Licence(
+                return LicenceJson(
                     tmpMap["licenceNumber"]!!.replace(" ", ""),
                     tmpMap["releasedBy"]!!.replace(" ", "").ifEmpty { tmpMap["releasedByAss"]!!.replace(" ", "") },
-                    tmpMap["type"]!!.replace(" ", ""),
                     tmpMap["season"]!!.replace(" ", ""),
                     (tmpMap["noKill"] == "No Kill" || tmpMap["noKill"] == "NoKill"),
                     tmpMap["type"]!!.replace(" ", ""),
@@ -108,5 +107,22 @@ class FishingLicencesManager(val connection: Database) {
         println("User: $user")
         println("tmpMap: $tmpMap")
         return user.verified && user.name == tmpMap["name"]!!.replace(" ", "") && user.surname == tmpMap["surname"]!!.replace(" ", "") && user.fiscalCode == tmpMap["CF"]!!.replace(" ", "")
+    }
+
+
+    fun getAllLicences(): List<LicenceJson>{
+        return transaction(connection) {
+            FishingLicencesTable.selectAll().orderBy(FishingLicencesTable.id, SortOrder.DESC).map {
+                LicenceJson(
+                    licenceNumber = it[FishingLicencesTable.licenceNumber],
+                    releasedBy = it[FishingLicencesTable.releasedBy],
+                    season = it[FishingLicencesTable.season],
+                    noKill =  it[FishingLicencesTable.noKill],
+                    type = it[FishingLicencesTable.status],
+                    qrCodeToken = it[FishingLicencesTable.qr_code_token],
+                    userId = it[FishingLicencesTable.userId]
+                )
+            }.toList()
+        }
     }
 }

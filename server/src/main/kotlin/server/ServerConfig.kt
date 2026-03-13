@@ -171,6 +171,16 @@ fun Application.module() {
             }
         }
 
+        post("/user/info/{userId}"){
+            try{
+                call.respond(userManager.getUserInfo(call.parameters["userId"]!!.toInt()))
+            }catch (e: Exception){
+                println("Error during user info retrieval: ${e.stackTraceToString()}")
+                call.respondText("failure")
+            }
+        }
+
+
         post("/licence/verify/fishing"){
             val input = call.receive<FishingLicenceJson>()
             try{
@@ -212,11 +222,24 @@ fun Application.module() {
                 val response = GoogleVision.extractTextFromImage(imageBytes!!)
                 println(response)
                 call.respondText(response)
-            }catch (e: Exception){
+            }catch (e: Exception) {
                 println("Error during licence analysis: ${e.stackTraceToString()}")
                 call.respondText("failure")
             }
+        }
 
+
+
+
+
+        // ADMIN ROUTES
+        get("/admin/licence"){
+            try{
+                call.respond(fishingLicenceManager.getAllLicences())
+            }catch(e: Exception){
+                println("Error during licence retrieval: ${e.stackTraceToString()}")
+                call.respondText("failure")
+            }
         }
 
     }

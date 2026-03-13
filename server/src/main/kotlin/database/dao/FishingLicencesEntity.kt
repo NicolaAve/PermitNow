@@ -13,7 +13,6 @@ class FishingLicencesEntity(id: EntityID<Int>) : IntEntity(id) {
     var status by FishingLicencesTable.status
     var licenceNumber by FishingLicencesTable.licenceNumber
     var releasedBy by FishingLicencesTable.releasedBy
-    var typeOfPermit by FishingLicencesTable.typeOfPermit
     var season by FishingLicencesTable.season
     var noKill by FishingLicencesTable.noKill
 

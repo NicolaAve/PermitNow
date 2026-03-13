@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 export const NavBarDashboard = () => {
   const links: Record<string, string> = {
     Dashboard: '/dashboard',
+    'Gestione Licenze': '/dashboard/licences',
     'Gestione Permessi': '/dashboard/permits',
     'Gestione Utenti': '/dashboard/users',
     Impostazioni: '/dashboard/settings',
