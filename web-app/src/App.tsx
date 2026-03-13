@@ -1,12 +1,25 @@
+import { DashboardHomePage } from './dashboard/DashboardHomePage';
+import { DashboardLoginPage } from './dashboard/login/DashboardLoginPage';
+import { HomePage } from './HomePage/HomePage';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+
+const router = createBrowserRouter([
+  {
+    path: '/',
+    element: <HomePage />, // Pagina di benvenuto indipendente
+  },
+  {
+    path: '/dashboard/login',
+    element: <DashboardLoginPage />, // Pagina della dashboard indipendente
+  },
+  {
+    path: '/dashboard',
+    element: <DashboardHomePage />, // Pagina della dashboard indipendente
+  },
+]);
+
 function App() {
-  return (
-    <div className="bg-debug-bg w-screen h-screen flex flex-col items-center justify-center gap-4">
-      <h1 className="text-debug-text text-4xl font-bold">sium testo</h1>
-      <div className="bg-debug-box w-32 h-32 rounded-lg flex items-center justify-center text-white font-bold shadow-md">
-        sium box
-      </div>
-    </div>
-  );
+  return <RouterProvider router={router} />;
 }
 
 export default App;
