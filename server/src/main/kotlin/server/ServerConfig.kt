@@ -32,6 +32,7 @@ import script.CipherLogic
 import script.FishingLicencesManager
 import script.FishingPermitsManager
 import script.GoogleVision
+import script.NewsManager
 import server.JSONModels.FishingLicenceJson
 import server.JSONModels.NewPermitJson
 import java.time.LocalDateTime
@@ -55,6 +56,7 @@ val userManager = UserManager(connection)
 val fishingLicenceManager = FishingLicencesManager(connection)
 val cipherLogic = CipherLogic(permitNowConfiguration.cipherConfiguration!!)
 val fishingPermitManager = FishingPermitsManager(connection)
+val newsManager = NewsManager(connection)
 
 
 fun Application.module() {
@@ -84,9 +86,38 @@ fun Application.module() {
 
 
     routing {
+        // STATUS ROUTES
         get("/status"){
-            call.respondText("Server is running: ${LocalDateTime.now()}")
+            call.respondText("OK")
         }
+
+        get("/status/permit"){
+            try{
+                fishingPermitManager.getAllPermits()
+                call.respondText("OK")
+            }catch (e: Exception){
+                call.respond("FA")
+            }
+        }
+
+        get("/status/licence"){
+            try{
+                fishingLicenceManager.getAllLicences()
+                call.respondText("OK")
+            }catch (e: Exception){
+                call.respond("FA")
+            }
+        }
+
+        get("/status/news"){
+            try{
+                newsManager.getAllNews()
+                call.respondText("OK")
+            }catch (e: Exception){
+                call.respond("FA")
+            }
+        }
+
 
 
 
