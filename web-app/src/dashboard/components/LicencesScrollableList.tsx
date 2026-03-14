@@ -3,6 +3,7 @@ import { apiClient } from '../../api/client';
 
 interface LicencesListProps {
   limit?: number;
+  maxHeight?: string;
 }
 
 interface UserRecord {
@@ -31,7 +32,10 @@ interface ListRecord {
   user: UserRecord;
 }
 
-export const LicencesScrollableList = ({ limit = 20 }: LicencesListProps) => {
+export const LicencesScrollableList = ({
+  limit = 20,
+  maxHeight,
+}: LicencesListProps) => {
   const [licences, setLicences] = useState<LicenceRecord[]>([]);
   const [records, setRecords] = useState<ListRecord[]>([]);
   const [fiscalCodeSearch, setFiscalCodeSearch] = useState('');
@@ -90,7 +94,10 @@ export const LicencesScrollableList = ({ limit = 20 }: LicencesListProps) => {
   };
 
   return (
-    <div className="max-h-[400px] overflow-y-auto p-2 ">
+    <div
+      className="overflow-y-auto p-2"
+      style={maxHeight ? { maxHeight } : undefined}
+    >
       <div className="mb-3 flex justify-end">
         <input
           type="text"
@@ -103,7 +110,7 @@ export const LicencesScrollableList = ({ limit = 20 }: LicencesListProps) => {
 
       {licences.length === 0 ? (
         <p className="text-center text-gray-500 py-8">
-          Nessun permesso trovato.
+          Nessuna licenza trovata.
         </p>
       ) : filteredRecords.length === 0 ? (
         <p className="text-center text-gray-500 py-8">

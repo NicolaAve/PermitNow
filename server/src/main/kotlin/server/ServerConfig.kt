@@ -93,8 +93,7 @@ fun Application.module() {
 
         get("/status/permit"){
             try{
-                fishingPermitManager.getAllPermits()
-                call.respondText("OK")
+                call.respond(fishingPermitManager.getValidPermits().count())
             }catch (e: Exception){
                 call.respond("FA")
             }
@@ -102,8 +101,7 @@ fun Application.module() {
 
         get("/status/licence"){
             try{
-                fishingLicenceManager.getAllLicences()
-                call.respondText("OK")
+                call.respond(fishingLicenceManager.getAllLicences().count())
             }catch (e: Exception){
                 call.respond("FA")
             }
@@ -111,8 +109,7 @@ fun Application.module() {
 
         get("/status/news"){
             try{
-                newsManager.getAllNews()
-                call.respondText("OK")
+                call.respond(newsManager.getAllNews().count())
             }catch (e: Exception){
                 call.respond("FA")
             }
@@ -319,7 +316,7 @@ fun Application.module() {
 
         get("/admin/permit"){
             try{
-                call.respond(fishingPermitManager.getAllPermits())
+                call.respond(fishingPermitManager.getValidPermits())
             }catch(e: Exception){
                 println("Error during permit retrieval: ${e.stackTraceToString()}")
             }

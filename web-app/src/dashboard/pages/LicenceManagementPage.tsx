@@ -1,6 +1,6 @@
 import React from 'react';
-import { LicencesScrollableList } from '../utils/LicencesScrollableList';
-import { NavBarDashboard } from '../utils/NavBarDashboard';
+import { LicencesScrollableList } from '../components/LicencesScrollableList';
+import { NavBarDashboard } from '../components/NavBarDashboard';
 
 export const LicenceManagementPage = () => {
   return (

@@ -3,6 +3,7 @@ package script
 import database.tables.FishingPermitsTable
 import exceptions.PermitException
 import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.SortOrder
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -16,16 +17,16 @@ class FishingPermitsManager(val connection: Database) {
 
     fun createNewPermit(newPermitJson: NewPermitJson): Int{
         try {
-            val tmpExpirationDate = LocalDate.now()
+            var tmpExpirationDate: LocalDate
             var permitType: TypesOfFishingPermits
             when(newPermitJson.type){
                 "daily" -> {
                     permitType = TypesOfFishingPermits.DAILY
-                    tmpExpirationDate.plusDays(1)
+                    tmpExpirationDate = LocalDate.now()
                 }
                 "annual" -> {
                     permitType = TypesOfFishingPermits.ANNUAL
-                    tmpExpirationDate.plusYears(1)
+                    tmpExpirationDate = LocalDate.now().plusYears(1)
                 }
                 else -> throw PermitException("Type of permit not valid.")
             }
@@ -70,6 +71,27 @@ class FishingPermitsManager(val connection: Database) {
         try {
             return transaction(connection){
                 FishingPermitsTable.selectAll().map {
+                    FishingPermitJson(
+                        it[FishingPermitsTable.type],
+                        it[FishingPermitsTable.expirationDate].toString(),
+                        it[FishingPermitsTable.qrCodeToken],
+                        it[FishingPermitsTable.userId],
+                    )
+                }
+            }
+        }catch (e: Exception){
+            throw PermitException("Error during Permit retrieve: ${e.message}")
+        }
+    }
+
+    fun getValidPermits(): List<FishingPermitJson>{
+        try {
+            return transaction(connection){
+                FishingPermitsTable.selectAll().orderBy(
+                    FishingPermitsTable.id, SortOrder.DESC
+                ).where {
+                    FishingPermitsTable.expirationDate greaterEq LocalDate.now()
+                }.map {
                     FishingPermitJson(
                         it[FishingPermitsTable.type],
                         it[FishingPermitsTable.expirationDate].toString(),

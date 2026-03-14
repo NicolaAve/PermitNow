@@ -3,6 +3,7 @@ import { apiClient } from '../../api/client';
 
 interface PermitsListProps {
   limit: number;
+  maxHeight?: string;
 }
 interface UserRecord {
   name: string;
@@ -26,7 +27,10 @@ interface ListRecord {
   user: UserRecord;
 }
 
-export const PermitsScrollableList = ({ limit = 20 }: PermitsListProps) => {
+export const PermitsScrollableList = ({
+  limit = 20,
+  maxHeight,
+}: PermitsListProps) => {
   const [permits, setPermits] = useState<PermitRecord[]>([]);
   const [records, setRecords] = useState<ListRecord[]>([]);
   const [fiscalCodeSearch, setFiscalCodeSearch] = useState('');
@@ -76,7 +80,10 @@ export const PermitsScrollableList = ({ limit = 20 }: PermitsListProps) => {
   }, [records, fiscalCodeSearch]);
 
   return (
-    <div className="max-h-[400px] overflow-y-auto p-2 ">
+    <div
+      className="overflow-y-auto p-2 "
+      style={maxHeight ? { maxHeight } : undefined}
+    >
       <div className="mb-3 flex justify-end">
         <input
           type="text"

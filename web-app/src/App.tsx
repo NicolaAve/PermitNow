@@ -1,6 +1,6 @@
 import { DashboardHomePage } from './dashboard/DashboardHomePage';
-import { LicenceManagementPage } from './dashboard/LicenceManagement/LicenceManagementPage';
-import { DashboardLoginPage } from './dashboard/login/DashboardLoginPage';
+import { LicenceManagementPage } from './dashboard/pages/LicenceManagementPage';
+import { DashboardLoginPage } from './dashboard/pages/DashboardLoginPage';
 import { HomePage } from './HomePage/HomePage';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
