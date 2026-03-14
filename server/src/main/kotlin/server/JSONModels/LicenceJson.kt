@@ -4,6 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 class LicenceJson(
+    val licenceId: Int,
     val licenceNumber: String,
     val releasedBy: String,
     val season: String,
@@ -15,6 +16,7 @@ class LicenceJson(
     override fun toString(): String {
         return """
 {
+    "licenceId": $licenceId,
     "licenceNumber": "$licenceNumber",
     "releasedBy": "$releasedBy",
     "season": "$season",

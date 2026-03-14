@@ -30,8 +30,10 @@ import server.JSONModels.LoginJson
 import server.JSONModels.RegisterJson
 import script.CipherLogic
 import script.FishingLicencesManager
+import script.FishingPermitsManager
 import script.GoogleVision
 import server.JSONModels.FishingLicenceJson
+import server.JSONModels.NewPermitJson
 import java.time.LocalDateTime
 
 
@@ -52,6 +54,7 @@ val connection = Database.connect(
 val userManager = UserManager(connection)
 val fishingLicenceManager = FishingLicencesManager(connection)
 val cipherLogic = CipherLogic(permitNowConfiguration.cipherConfiguration!!)
+val fishingPermitManager = FishingPermitsManager(connection)
 
 
 fun Application.module() {
@@ -84,6 +87,10 @@ fun Application.module() {
         get("/status"){
             call.respondText("Server is running: ${LocalDateTime.now()}")
         }
+
+
+
+        // USER ROUTES,
 
         post("/register"){
             val input = call.receive<RegisterJson>()
@@ -171,6 +178,9 @@ fun Application.module() {
             }
         }
 
+
+
+        // LICENCE ROUTES
         post("/user/info/{userId}"){
             try{
                 call.respond(userManager.getUserInfo(call.parameters["userId"]!!.toInt()))
@@ -229,6 +239,40 @@ fun Application.module() {
         }
 
 
+        get("/licence/approve/{licenceId}"){
+            try {
+                fishingLicenceManager.approveLicence(call.parameters["licenceId"]!!.toInt())
+                call.respondText("success")
+            }catch (e: Exception){
+                println("Error during licence approval: ${e.stackTraceToString()}")
+                call.respondText("failure")
+            }
+        }
+
+
+
+        // PERMIT ROUTES
+        post("/permit"){
+            val input = call.receive<NewPermitJson>()
+            try {
+                val permitId = fishingPermitManager.createNewPermit(input)
+                call.respond(permitId)
+            }catch (e: Exception){
+                call.respondText("failure")
+            }
+        }
+
+        get("/permit/{userId}"){
+            val userId = call.parameters["userId"]!!.toInt()
+
+            try {
+                call.respond(fishingPermitManager.getPermitsForUser(userId))
+            }catch (e: Exception){
+                call.respondText("failure")
+            }
+        }
+
+
 
 
 
@@ -239,6 +283,14 @@ fun Application.module() {
             }catch(e: Exception){
                 println("Error during licence retrieval: ${e.stackTraceToString()}")
                 call.respondText("failure")
+            }
+        }
+
+        get("/admin/permit"){
+            try{
+                call.respond(fishingPermitManager.getAllPermits())
+            }catch(e: Exception){
+                println("Error during permit retrieval: ${e.stackTraceToString()}")
             }
         }
 

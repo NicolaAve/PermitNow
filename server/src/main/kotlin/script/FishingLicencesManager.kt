@@ -9,7 +9,10 @@ import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.transactions.transaction
 import utils.models.User
 import org.jetbrains.exposed.sql.selectAll
+import org.jetbrains.exposed.sql.update
 import server.JSONModels.LicenceJson
+import utils.CommonFunctions
+import utils.models.Licence
 import java.util.UUID
 
 class FishingLicencesManager(val connection: Database) {
@@ -23,7 +26,7 @@ class FishingLicencesManager(val connection: Database) {
                     it[FishingLicencesTable.releasedBy] = licence.releasedBy
                     it[FishingLicencesTable.userId] = userId
                     it[FishingLicencesTable.status] = "pending"
-                    it[FishingLicencesTable.qr_code_token] = generateQRCodeToken()
+                    it[FishingLicencesTable.qr_code_token] = CommonFunctions.generateQRCodeToken()
                     it[FishingLicencesTable.season] = licence.season
                     it[FishingLicencesTable.noKill] = licence.noKill
                 }
@@ -33,12 +36,7 @@ class FishingLicencesManager(val connection: Database) {
         }
     }
 
-
-    fun generateQRCodeToken(): String{
-         return UUID.randomUUID().toString()
-    }
-
-    fun getLicenceFromText(retrievedText: String, userId: Int): LicenceJson{
+    fun getLicenceFromText(retrievedText: String, userId: Int): Licence{
 
         val tmpMap = mutableMapOf<String, String>()
 
@@ -84,13 +82,13 @@ class FishingLicencesManager(val connection: Database) {
 
         try {
             if(isValid(user, tmpMap)){
-                return LicenceJson(
+                return Licence(
                     tmpMap["licenceNumber"]!!.replace(" ", ""),
                     tmpMap["releasedBy"]!!.replace(" ", "").ifEmpty { tmpMap["releasedByAss"]!!.replace(" ", "") },
                     tmpMap["season"]!!.replace(" ", ""),
                     (tmpMap["noKill"] == "No Kill" || tmpMap["noKill"] == "NoKill"),
                     tmpMap["type"]!!.replace(" ", ""),
-                    generateQRCodeToken(),
+                    CommonFunctions.generateQRCodeToken(),
                     userId
                 )
             }else{
@@ -114,6 +112,7 @@ class FishingLicencesManager(val connection: Database) {
         return transaction(connection) {
             FishingLicencesTable.selectAll().orderBy(FishingLicencesTable.id, SortOrder.DESC).map {
                 LicenceJson(
+                    licenceId = it[FishingLicencesTable.id].toString().toInt(),
                     licenceNumber = it[FishingLicencesTable.licenceNumber],
                     releasedBy = it[FishingLicencesTable.releasedBy],
                     season = it[FishingLicencesTable.season],
@@ -123,6 +122,19 @@ class FishingLicencesManager(val connection: Database) {
                     userId = it[FishingLicencesTable.userId]
                 )
             }.toList()
+        }
+    }
+
+
+    fun approveLicence(licenceId: Int){
+        try {
+            transaction(connection){
+                FishingLicencesTable.update({ FishingLicencesTable.id eq licenceId}) {
+                    it[FishingLicencesTable.status] = "valid"
+                }
+            }
+        }catch (e: Exception){
+            throw FishingLicenceException("Error approving licence: ${e.message}")
         }
     }
 }
